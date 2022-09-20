@@ -104,13 +104,6 @@ pred_layout.resizable(False, False)
 pred_layout.iconbitmap(
     r'E:\Development\Python\ML\Sport Match Prediction\Desktop App\premier-league-logo-vector.ico')
 
-# Logo
-# img = Canvas(pred_layout, height=25, width=25, bg="White")
-# img.pack()
-# pic = ImageTk.PhotoImage(Image.open(
-#     r"E:\Development\Python\ML\Sport Match Prediction\premier-league-logo-vector.png"))
-# img.create_image(0, 0, image=pic, anchor=NW)
-
 # Heading
 Label(pred_layout, text="Football Match Prediction", font=(
     "Bell MT", 17, "bold", "underline"), bg="White").pack()
