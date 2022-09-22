@@ -1,4 +1,3 @@
-from distutils.cmd import Command
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -107,17 +106,17 @@ def pred_fn_auto():
         d = random.randint(0, 6)
         day.set(get_key(d, day_menu))
 
-        # xg1 = round(random.uniform(0.0, 4.6), 1)
-        # xg.delete(0, END)
-        # xg.insert(0, xg1)
+        xg1 = round(random.uniform(0.0, 4.6), 1)
+        xg.delete(0, END)
+        xg.insert(0, xg1)
 
-        # xga1 = round(random.uniform(0.0, 5.0), 1)
-        # xga.delete(0, END)
-        # xga.insert(0, xga1)
+        xga1 = round(random.uniform(0.0, 5.0), 1)
+        xga.delete(0, END)
+        xga.insert(0, xga1)
 
-        # gf1 = round(random.uniform(0.0, 9.0), 1)
-        # gf.delete(0, END)
-        # gf.insert(0, gf1)
+        gf1 = round(random.uniform(0.0, 9.0), 1)
+        gf.delete(0, END)
+        gf.insert(0, gf1)
         predictors(t1, t2, ven, hr, d, xg1, xga1, gf1)
 
     else:
