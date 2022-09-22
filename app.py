@@ -1,3 +1,4 @@
+from distutils.cmd import Command
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -5,19 +6,19 @@ import pickle
 import random
 
 # Predictors
-def predictors(t1, t2, ven, hr, d, xg1, xga1, gf1):
+def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
     load = pickle.load(
         open(
             "E:\\Development\\Python\\ML\\Sport Match Prediction\\Desktop App\\Final.pkl",
             "rb",
         )
     )
-    pred = load.predict([[t1, t2, ven, hr, d, xg1, xga1, gf1]])
-
+    pred = load.predict([[ven, t1, t2, hr, d, xg1, xga1, gf1]])
+    print(pred[0])
     if pred[0] == 1:
-        output_win.set("Win")
-    else:
-        output_lose.set("Lose/Draw")
+        messagebox.showinfo("Result", "Your Team Wins")
+    elif pred[0] == 0:
+        messagebox.showinfo("Result", "Your Team Lose/Draw")
 
 
 # Get Key from Values
@@ -30,10 +31,10 @@ def get_key(val, dict):
 def auto_fill_label(X, Y):
     Label(
         pred_layout,
-        text="*AUTOFILL",
-        font=("Bell MT", 8, "italic"),
+        text="*auto_fill",
+        font=("Calibri", 12, "italic"),
         bg="White",
-        fg="Red",
+        fg="Green",
     ).place(x=X, y=Y)
 
 
@@ -63,17 +64,19 @@ def auto_fill(event):
         [22, 6.84, 8.37, 3],
     ]
     for i in range(23):
-        if val[i][0] == t1:
+        if val[i][0] == t1 and (
+            t1 != 4 or t1 != 15 or t1 != 16 or t1 != 19 or t1 != 20
+        ):
             xg1, xga1, gf1 = val[i][1], val[i][2], val[i][3]
             xg.delete(0, END)
             xg.insert(0, xg1)
-            auto_fill_label(220, 272)
+            auto_fill_label(220, 270)
             xga.delete(0, END)
             xga.insert(0, xga1)
-            auto_fill_label(220, 312)
+            auto_fill_label(220, 310)
             gf.delete(0, END)
             gf.insert(0, gf1)
-            auto_fill_label(220, 352)
+            auto_fill_label(220, 350)
             break
 
 
@@ -95,7 +98,7 @@ def pred_fn_auto():
     ):
         team1.set(get_key(t1, team_menu))
         team2.set(get_key(t2, team_menu))
-
+        print(t1, "-", t2, end="-")
         ven = random.randint(0, 1)
         venue.set(ven + 1)
 
@@ -106,18 +109,18 @@ def pred_fn_auto():
         d = random.randint(0, 6)
         day.set(get_key(d, day_menu))
 
-        xg1 = round(random.uniform(0.0, 4.6), 1)
+        xg1 = round(random.uniform(0.00, 4.60), 2)
         xg.delete(0, END)
         xg.insert(0, xg1)
 
-        xga1 = round(random.uniform(0.0, 5.0), 1)
+        xga1 = round(random.uniform(0.00, 5.00), 2)
         xga.delete(0, END)
         xga.insert(0, xga1)
 
-        gf1 = round(random.uniform(0.0, 9.0), 1)
+        gf1 = round(random.uniform(0.00, 9.00), 2)
         gf.delete(0, END)
         gf.insert(0, gf1)
-        predictors(t1, t2, ven, hr, d, xg1, xga1, gf1)
+        predictors(ven, t1, t2, hr, d, xg1, xga1, gf1)
 
     else:
         pred_fn_auto()  # Recursion
@@ -128,16 +131,16 @@ def pred_fn():
 
     try:
         t2 = team_menu.get(team2.get())
-        d = day_menu.get(day.get())
         ven = venue.get()
         hr = int(hour.get())
-        if hr < 0 or hr >= 24 or xg1 < 0.0 or xga1 < 0.0 or gf1 < 0.0:
-            messagebox.showerror("Error", "Invalid values")
+        d = day_menu.get(day.get())
+        if hr <= 0 or hr >= 24 or xg1 < 0.0 or xga1 < 0.0 or gf1 < 0.0:
+            messagebox.askretrycancel("Invalid Values", "Try again?")
 
         elif t1 == t2:
-            messagebox.showwarning("Warning", "Teams cannot be same")
+            messagebox.askretrycancel("Same Teams", "Try again?")
         else:
-            predictors(t1, t2, ven, hr, d, xg1, xga1, gf1)
+            predictors(ven, t1, t2, hr, d, xg1, xga1, gf1)
     except:
         messagebox.showwarning("Warning", "Fields can't be NULL")
 
@@ -147,7 +150,7 @@ pred_layout = Tk()
 
 # Window Position
 window_width = 360
-window_height = 480
+window_height = 440
 screen_width = pred_layout.winfo_screenwidth()
 screen_height = pred_layout.winfo_screenheight()
 center_x = int(screen_width / 2 - window_width / 2)
@@ -203,32 +206,33 @@ Label(pred_layout, text="Your Team :", font=("Bell MT", 15), bg="White").place(
 )
 
 menu = sorted(team_menu.keys(), reverse=False)
-team1 = StringVar()
+""" Option Menu """
+# team1 = StringVar()
+# team1.set("Choose Team")
+# menu1 = OptionMenu(pred_layout, team1, *menu, command=auto_fill)
+# menu1.configure(font=("Times New Roman", 12))
+# menu1.place(x=155, y=70)
+""" ComboBox """
+team1 = ttk.Combobox(pred_layout, values=menu, width=21)
+team1.configure(font=("Times New Roman", 12))
+team1.place(x=155, y=70)
 team1.set("Choose Team")
-menu1 = OptionMenu(pred_layout, team1, *menu, command=auto_fill)
-menu1.configure(
-    font=("Times New Roman", 11),
-    bg="White",
-    highlightthickness=0.2,
-    highlightbackground="Black",
-)
-menu1.place(x=155, y=70)
-
+team1.bind("<<ComboboxSelected>>", auto_fill)
 # Team 2
 Label(pred_layout, text="Opponent :", font=("Bell MT", 15), bg="White").place(
     x=35, y=110
 )
-
-team2 = StringVar()
+""" Option Menu """
+# team2 = StringVar()
+# team2.set("Choose Team")
+# menu2 = OptionMenu(pred_layout, team2, *menu, command=auto_fill)
+# menu2.configure(font=("Times New Roman", 12))
+# menu2.place(x=155, y=110)
+""" ComboBox """
+team2 = ttk.Combobox(pred_layout, values=menu, width=21)
+team2.configure(font=("Times New Roman", 12))
+team2.place(x=155, y=110)
 team2.set("Choose Team")
-menu2 = OptionMenu(pred_layout, team2, *menu)
-menu2.configure(
-    font=("Times New Roman", 11),
-    bg="White",
-    highlightthickness=0.2,
-    highlightbackground="Black",
-)
-menu2.place(x=155, y=110)
 
 # Venue
 Label(pred_layout, text="Venue :", font=("Bell MT", 15), bg="White").place(x=35, y=150)
@@ -236,7 +240,7 @@ venue = IntVar()
 Radiobutton(
     pred_layout,
     text="Away",
-    font=("Times New Roman", 15),
+    font=("Times New Roman", 12),
     bg="White",
     value=1,
     variable=venue,
@@ -244,7 +248,7 @@ Radiobutton(
 Radiobutton(
     pred_layout,
     text="Home",
-    font=("Times New Roman", 15),
+    font=("Times New Roman", 12),
     bg="White",
     value=2,
     variable=venue,
@@ -266,18 +270,19 @@ day_menu = {
     "Sunday": 3,
 }
 Label(pred_layout, text="Day :", font=("Bell MT", 15), bg="White").place(x=35, y=230)
-
 day_keys = list(day_menu.keys())
-day = StringVar()
+
+""" OptionMenu"""
+# day = StringVar()
+# day.set("Choose Team")
+# menu3 = OptionMenu(pred_layout, day, *day_menu)
+# menu3.configure(font=("Times New Roman", 12))
+# menu3.place(x=155, y=230)
+""" ComboBox """
+day = ttk.Combobox(pred_layout, values=day_keys, width=11)
+day.configure(font=("Times New Roman", 11))
+day.place(x=155, y=230)
 day.set("Choose Day")
-menu3 = OptionMenu(pred_layout, day, *day_keys)
-menu3.configure(
-    font=("Times New Roman", 11),
-    bg="White",
-    highlightthickness=0.2,
-    highlightbackground="Black",
-)
-menu3.place(x=155, y=230)
 
 # xg
 Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35, y=270)
@@ -298,29 +303,6 @@ Label(pred_layout, text="Goal for :", font=("Bell MT", 15), bg="White").place(
 gf = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 gf.place(x=155, y=350)
 
-# Output
-output_win = StringVar()
-result_win = Label(
-    pred_layout,
-    text="",
-    textvariable=output_win,
-    font=("Times New Roman", 20),
-    bg="White",
-)
-result_win.config(highlightbackground="Black")
-result_win.place(x=150, y=385)
-
-output_lose = StringVar()
-result_lose = Label(
-    pred_layout,
-    text="",
-    textvariable=output_lose,
-    font=("Times New Roman", 20),
-    bg="White",
-)
-result_lose.config(highlightbackground="Black")
-result_lose.place(x=110, y=385)
-
 # Output Button (Manual)
 predict = Button(
     pred_layout,
@@ -331,7 +313,7 @@ predict = Button(
     fg="White",
     command=pred_fn,
 )
-predict.place(x=0, y=440)
+predict.place(x=0, y=400)
 
 # Output Button (Automated)
 predict_auto = Button(
@@ -343,6 +325,7 @@ predict_auto = Button(
     fg="White",
     command=pred_fn_auto,
 )
-predict_auto.place(x=180, y=440)
+predict_auto.place(x=180, y=400)
+
 
 pred_layout.mainloop()
