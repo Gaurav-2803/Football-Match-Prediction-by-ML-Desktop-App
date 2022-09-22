@@ -1,9 +1,9 @@
+from distutils.cmd import Command
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import pickle
 import random
-
 
 # Predictors
 def predictors(t1, t2, ven, hr, d, xg1, xga1, gf1):
@@ -27,7 +27,57 @@ def get_key(val, dict):
         if val == value:
             return key
 
-        
+
+def auto_fill_label(X, Y):
+    Label(
+        pred_layout,
+        text="*AUTOFILL",
+        font=("Bell MT", 8, "italic"),
+        bg="White",
+        fg="Red",
+    ).place(x=X, y=Y)
+
+
+# Auto Fill
+def auto_fill(event):
+    global t1, xg1, xga1, gf1
+    t1 = team_menu.get(team1.get())
+    # [team,xg,xga,gf]
+    val = [
+        [0, 14.17, 5.9, 17],
+        [1, 6.18, 10.15, 6],
+        [2, 11.10, 9.8, 15],
+        [3, 11.26, 5.66, 11],
+        [5, 8.42, 9.16, 8],
+        [6, 7.55, 11.39, 7],
+        [7, 7.97, 10.88, 5],
+        [8, 8.98, 13.23, 12],
+        [9, 9.09, 8.73, 10],
+        [10, 6.62, 12.75, 10],
+        [11, 14.11, 7.15, 15],
+        [12, 17.52, 3.99, 23],
+        [13, 8.81, 8.04, 8],
+        [14, 11.29, 10.31, 8],
+        [17, 7.26, 9.15, 11],
+        [18, 12.5, 7.21, 18],
+        [21, 7.03, 8.52, 3],
+        [22, 6.84, 8.37, 3],
+    ]
+    for i in range(23):
+        if val[i][0] == t1:
+            xg1, xga1, gf1 = val[i][1], val[i][2], val[i][3]
+            xg.delete(0, END)
+            xg.insert(0, xg1)
+            auto_fill_label(220, 272)
+            xga.delete(0, END)
+            xga.insert(0, xga1)
+            auto_fill_label(220, 312)
+            gf.delete(0, END)
+            gf.insert(0, gf1)
+            auto_fill_label(220, 352)
+            break
+
+
 # Auto Prediction Function
 def pred_fn_auto():
     t1 = random.randint(0, 22)
@@ -57,17 +107,17 @@ def pred_fn_auto():
         d = random.randint(0, 6)
         day.set(get_key(d, day_menu))
 
-        xg1 = round(random.uniform(0.0, 4.6), 1)
-        xg.delete(0, END)
-        xg.insert(0, xg1)
+        # xg1 = round(random.uniform(0.0, 4.6), 1)
+        # xg.delete(0, END)
+        # xg.insert(0, xg1)
 
-        xga1 = round(random.uniform(0.0, 5.0), 1)
-        xga.delete(0, END)
-        xga.insert(0, xga1)
+        # xga1 = round(random.uniform(0.0, 5.0), 1)
+        # xga.delete(0, END)
+        # xga.insert(0, xga1)
 
-        gf1 = round(random.uniform(0.0, 9.0), 1)
-        gf.delete(0, END)
-        gf.insert(0, gf1)
+        # gf1 = round(random.uniform(0.0, 9.0), 1)
+        # gf.delete(0, END)
+        # gf.insert(0, gf1)
         predictors(t1, t2, ven, hr, d, xg1, xga1, gf1)
 
     else:
@@ -76,42 +126,9 @@ def pred_fn_auto():
 
 # Prediction Function
 def pred_fn():
+
     try:
-        t1 = team_menu.get(team1.get())
         t2 = team_menu.get(team2.get())
-        # [team,xg,xga,gf]
-        val = [
-            [0, 14.17, 5.9, 17],
-            [1, 6.18, 10.15, 6],
-            [2, 11.10, 9.8, 15],
-            [3, 11.26, 5.66, 11],
-            [5, 8.42, 9.16, 8],
-            [6, 7.55, 11.39, 7],
-            [7, 7.97, 10.88, 5],
-            [8, 8.98, 13.23, 12],
-            [9, 9.09, 8.73, 10],
-            [10, 6.62, 12.75, 10],
-            [11, 14.11, 7.15, 15],
-            [12, 17.52, 3.99, 23],
-            [13, 8.81, 8.04, 8],
-            [14, 11.29, 10.31, 8],
-            [17, 7.26, 9.15, 11],
-            [18, 12.5, 7.21, 18],
-            [21, 7.03, 8.52, 3],
-            [22, 6.84, 8.37, 3],
-        ]
-        for i in range(23):
-            if val[i][0] == t1:
-                xg1, xga1, gf1 = val[i][1], val[i][2], val[i][3]
-
-                gf.delete(0, END)
-                gf.insert(0, gf1)
-                xg.delete(0, END)
-                xg.insert(0, xg1)
-                xga.delete(0, END)
-                xga.insert(0, xga1)
-                break
-
         d = day_menu.get(day.get())
         ven = venue.get()
         hr = int(hour.get())
@@ -120,7 +137,6 @@ def pred_fn():
 
         elif t1 == t2:
             messagebox.showwarning("Warning", "Teams cannot be same")
-
         else:
             predictors(t1, t2, ven, hr, d, xg1, xga1, gf1)
     except:
@@ -266,21 +282,21 @@ menu3.place(x=155, y=230)
 
 # xg
 Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35, y=270)
-xg = Entry(pred_layout, width=4, font=("Times New Roman", 15))
+xg = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 xg.place(x=155, y=270)
 
 # xga
 Label(pred_layout, text="XG Against :", font=("Bell MT", 15), bg="White").place(
     x=35, y=310
 )
-xga = Entry(pred_layout, width=4, font=("Times New Roman", 15))
+xga = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 xga.place(x=155, y=310)
 
 # gf
 Label(pred_layout, text="Goal for :", font=("Bell MT", 15), bg="White").place(
     x=35, y=350
 )
-gf = Entry(pred_layout, width=4, font=("Times New Roman", 15))
+gf = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 gf.place(x=155, y=350)
 
 # Output
