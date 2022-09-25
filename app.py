@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import pickle
 import random
+import time
 
 # Predictors
 def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
@@ -13,7 +14,6 @@ def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
         )
     )
     pred = load.predict([[ven, t1, t2, hr, d, xg1, xga1, gf1]])
-    print(pred[0])
     if pred[0] == 1:
         messagebox.showinfo("Result", "Your Team Wins")
     elif pred[0] == 0:
@@ -27,6 +27,7 @@ def get_key(val, dict):
             return key
 
 
+# Label for Auto Fill Warning
 def auto_fill_label(X, Y):
     Label(
         pred_layout,
@@ -35,6 +36,40 @@ def auto_fill_label(X, Y):
         bg="White",
         fg="Green",
     ).place(x=X, y=Y)
+
+
+# Search
+def search(event):
+    value_to_search = event.widget.get()
+    # Team 1
+    if value_to_search == "" or value_to_search == " " and team1.get():
+        team1["values"] = menu
+    else:
+        res = []
+        for value in menu:
+            if value_to_search in value:
+                res.append(value)
+        team1["values"] = res
+    # Team 2
+    if value_to_search == "" or value_to_search == " " and team2.get():
+        team2["values"] = menu
+
+    else:
+        res = []
+        for value in menu:
+            if value_to_search in value:
+                res.append(value)
+        team2["values"] = res
+
+    # Day
+    if value_to_search == "" or value_to_search == " " and day.get():
+        day["values"] = day_keys
+    else:
+        res = []
+        for value in day_keys:
+            if value_to_search in value:
+                res.append(value)
+        day["values"] = res
 
 
 # Auto Fill
@@ -195,7 +230,6 @@ team_menu = {
 Label(pred_layout, text="Your Team :", font=("Bell MT", 15), bg="White").place(
     x=35, y=70
 )
-
 menu = sorted(team_menu.keys(), reverse=False)
 """ Option Menu """
 # team1 = StringVar()
@@ -209,6 +243,7 @@ team1.configure(font=("Times New Roman", 12))
 team1.place(x=155, y=70)
 team1.set("Choose Team")
 team1.bind("<<ComboboxSelected>>", auto_fill)
+team1.bind("<KeyRelease>", search)
 # Team 2
 Label(pred_layout, text="Opponent :", font=("Bell MT", 15), bg="White").place(
     x=35, y=110
@@ -224,6 +259,7 @@ team2 = ttk.Combobox(pred_layout, values=menu, width=21)
 team2.configure(font=("Times New Roman", 12))
 team2.place(x=155, y=110)
 team2.set("Choose Team")
+team2.bind("<KeyRelease>", search)
 
 # Venue
 Label(pred_layout, text="Venue :", font=("Bell MT", 15), bg="White").place(x=35, y=150)
@@ -274,6 +310,7 @@ day = ttk.Combobox(pred_layout, values=day_keys, width=11)
 day.configure(font=("Times New Roman", 11))
 day.place(x=155, y=230)
 day.set("Choose Day")
+day.bind("<KeyRelease>", search)
 
 # xg
 Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35, y=270)
