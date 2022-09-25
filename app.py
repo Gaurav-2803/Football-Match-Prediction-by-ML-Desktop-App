@@ -38,8 +38,8 @@ def auto_fill_label(X, Y):
     ).place(x=X, y=Y)
 
 
-# Search
-def search(event):
+# Team1 Search
+def search1(event):
     value_to_search = event.widget.get()
     # Team 1
     if value_to_search == "" or value_to_search == " " and team1.get():
@@ -50,6 +50,11 @@ def search(event):
             if value_to_search in value:
                 res.append(value)
         team1["values"] = res
+
+
+# Team2 Search
+def search2(event):
+    value_to_search = event.widget.get()
     # Team 2
     if value_to_search == "" or value_to_search == " " and team2.get():
         team2["values"] = menu
@@ -61,6 +66,10 @@ def search(event):
                 res.append(value)
         team2["values"] = res
 
+
+# Day Search
+def search3(event):
+    value_to_search = event.widget.get()
     # Day
     if value_to_search == "" or value_to_search == " " and day.get():
         day["values"] = day_keys
@@ -231,35 +240,21 @@ Label(pred_layout, text="Your Team :", font=("Bell MT", 15), bg="White").place(
     x=35, y=70
 )
 menu = sorted(team_menu.keys(), reverse=False)
-""" Option Menu """
-# team1 = StringVar()
-# team1.set("Choose Team")
-# menu1 = OptionMenu(pred_layout, team1, *menu, command=auto_fill)
-# menu1.configure(font=("Times New Roman", 12))
-# menu1.place(x=155, y=70)
-""" ComboBox """
 team1 = ttk.Combobox(pred_layout, values=menu, width=21)
 team1.configure(font=("Times New Roman", 12))
 team1.place(x=155, y=70)
-team1.set("Choose Team")
+team1.set("Team 1")
 team1.bind("<<ComboboxSelected>>", auto_fill)
-team1.bind("<KeyRelease>", search)
+team1.bind("<KeyRelease>", search1)
 # Team 2
 Label(pred_layout, text="Opponent :", font=("Bell MT", 15), bg="White").place(
     x=35, y=110
 )
-""" Option Menu """
-# team2 = StringVar()
-# team2.set("Choose Team")
-# menu2 = OptionMenu(pred_layout, team2, *menu, command=auto_fill)
-# menu2.configure(font=("Times New Roman", 12))
-# menu2.place(x=155, y=110)
-""" ComboBox """
 team2 = ttk.Combobox(pred_layout, values=menu, width=21)
 team2.configure(font=("Times New Roman", 12))
 team2.place(x=155, y=110)
-team2.set("Choose Team")
-team2.bind("<KeyRelease>", search)
+team2.set("Team 2")
+team2.bind("<KeyRelease>", search2)
 
 # Venue
 Label(pred_layout, text="Venue :", font=("Bell MT", 15), bg="White").place(x=35, y=150)
@@ -298,19 +293,11 @@ day_menu = {
 }
 Label(pred_layout, text="Day :", font=("Bell MT", 15), bg="White").place(x=35, y=230)
 day_keys = list(day_menu.keys())
-
-""" OptionMenu"""
-# day = StringVar()
-# day.set("Choose Team")
-# menu3 = OptionMenu(pred_layout, day, *day_menu)
-# menu3.configure(font=("Times New Roman", 12))
-# menu3.place(x=155, y=230)
-""" ComboBox """
 day = ttk.Combobox(pred_layout, values=day_keys, width=11)
 day.configure(font=("Times New Roman", 11))
 day.place(x=155, y=230)
-day.set("Choose Day")
-day.bind("<KeyRelease>", search)
+day.set("Day")
+day.bind("<KeyRelease>", search3)
 
 # xg
 Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35, y=270)
