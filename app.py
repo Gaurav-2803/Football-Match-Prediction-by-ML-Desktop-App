@@ -1,4 +1,3 @@
-from distutils.cmd import Command
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -84,21 +83,13 @@ def auto_fill(event):
 def pred_fn_auto():
     t1 = random.randint(0, 22)
     t2 = random.randint(0, 22)
-    if t1 != t2 and (
-        t1 != 4
-        or t1 != 15
-        or t1 != 16
-        or t1 != 19
-        or t1 != 20
-        or t2 != 4
-        or t2 != 15
-        or t2 != 16
-        or t2 != 19
-        or t2 != 20
+    if (
+        (t1 != t2)
+        and (t1 != 4 and t1 != 15 and t1 != 16 and t1 != 19 and t1 != 20)
+        and (t2 != 4 and t2 != 15 and t2 != 16 and t2 != 19 and t2 != 20)
     ):
         team1.set(get_key(t1, team_menu))
         team2.set(get_key(t2, team_menu))
-        print(t1, "-", t2, end="-")
         ven = random.randint(0, 1)
         venue.set(ven + 1)
 
