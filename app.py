@@ -3,17 +3,54 @@ from tkinter import ttk
 from tkinter import messagebox
 import pickle
 import random
-import time
+import mysql.connector
 
-# Predictors
+# Database Connection
+
+
+def make_conn():
+    global mydb
+    mydb = mysql.connector.connect(host="localhost",
+                                   user="root",
+                                   password="root@123",
+                                   database="my_projects")
+    global cursor
+    cursor = mydb.cursor()
+
+# Insert data in Database
+
+
+def insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred):
+    make_conn()
+    query = "INSERT INTO FOOTBALL_PRED_RES(VENUE,TEAM,OPPONENT,TIME,DAY,XG,XGA,GF,Pred_Result) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+
+    ven = ("Home" if ven == 1 else "Away")
+
+    pred = ("Win" if pred[0] == 1 else "Lose")
+
+    t1 = get_key(t1, team_menu)
+    t2 = get_key(t2, team_menu)
+    d = get_key(d, day_menu)
+    val = (ven, t1, t2, hr, d, xg1, xga1, gf1, pred)
+
+    cursor.execute(query, val)
+    mydb.commit()
+    print(cursor.rowcount, "Record Inserted")
+    cursor.close()
+
+# Prediction
+
+
 def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
     load = pickle.load(
         open(
             "E:\\Development\\Python\\ML\\Sport Match Prediction\\Desktop App\\Final.pkl",
             "rb",
-        )
-    )
+        ))
     pred = load.predict([[ven, t1, t2, hr, d, xg1, xga1, gf1]])
+
+    insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred)
+
     if pred[0] == 1:
         messagebox.showinfo("Result", "Your Team Wins")
     elif pred[0] == 0:
@@ -107,9 +144,8 @@ def auto_fill(event):
         [22, 6.84, 8.37, 3],
     ]
     for i in range(23):
-        if val[i][0] == t1 and (
-            t1 != 4 or t1 != 15 or t1 != 16 or t1 != 19 or t1 != 20
-        ):
+        if val[i][0] == t1 and (t1 != 4 or t1 != 15 or t1 != 16 or t1 != 19
+                                or t1 != 20):
             xg1, xga1, gf1 = val[i][1], val[i][2], val[i][3]
             xg.delete(0, END)
             xg.insert(0, xg1)
@@ -127,15 +163,13 @@ def auto_fill(event):
 def pred_fn_auto():
     t1 = random.randint(0, 22)
     t2 = random.randint(0, 22)
-    if (
-        (t1 != t2)
-        and (t1 != 4 and t1 != 15 and t1 != 16 and t1 != 19 and t1 != 20)
-        and (t2 != 4 and t2 != 15 and t2 != 16 and t2 != 19 and t2 != 20)
-    ):
+    if ((t1 != t2)
+            and (t1 != 4 and t1 != 15 and t1 != 16 and t1 != 19 and t1 != 20)
+            and (t2 != 4 and t2 != 15 and t2 != 16 and t2 != 19 and t2 != 20)):
         team1.set(get_key(t1, team_menu))
         team2.set(get_key(t2, team_menu))
-        ven = random.randint(0, 1)
-        venue.set(ven + 1)
+        ven = random.choice([0, 1])
+        venue.set(ven)
 
         hr = random.randint(0, 23)
         hour.delete(0, END)
@@ -236,9 +270,8 @@ team_menu = {
     "Liverpool": 11,
     "Fulham": 8,
 }
-Label(pred_layout, text="Your Team :", font=("Bell MT", 15), bg="White").place(
-    x=35, y=70
-)
+Label(pred_layout, text="Your Team :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=70)
 menu = sorted(team_menu.keys(), reverse=False)
 team1 = ttk.Combobox(pred_layout, values=menu, width=21)
 team1.configure(font=("Times New Roman", 12))
@@ -247,9 +280,8 @@ team1.set("Team 1")
 team1.bind("<<ComboboxSelected>>", auto_fill)
 team1.bind("<KeyRelease>", search1)
 # Team 2
-Label(pred_layout, text="Opponent :", font=("Bell MT", 15), bg="White").place(
-    x=35, y=110
-)
+Label(pred_layout, text="Opponent :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=110)
 team2 = ttk.Combobox(pred_layout, values=menu, width=21)
 team2.configure(font=("Times New Roman", 12))
 team2.place(x=155, y=110)
@@ -257,27 +289,34 @@ team2.set("Team 2")
 team2.bind("<KeyRelease>", search2)
 
 # Venue
-Label(pred_layout, text="Venue :", font=("Bell MT", 15), bg="White").place(x=35, y=150)
+Label(pred_layout, text="Venue :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=150)
 venue = IntVar()
-Radiobutton(
+
+r0 = Radiobutton(
     pred_layout,
     text="Away",
     font=("Times New Roman", 12),
     bg="White",
-    value=1,
     variable=venue,
-).place(x=155, y=150)
-Radiobutton(
+    value=0
+)
+r0.place(x=155, y=150)
+
+r1 = Radiobutton(
     pred_layout,
     text="Home",
     font=("Times New Roman", 12),
     bg="White",
-    value=2,
     variable=venue,
-).place(x=240, y=150)
+    value=1
+)
+r1.place(x=240, y=150)
+venue.set(None)
 
 # Hour
-Label(pred_layout, text="Hour  :", font=("Bell MT", 15), bg="White").place(x=35, y=190)
+Label(pred_layout, text="Hour  :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=190)
 hour = Entry(pred_layout, width=4, font=("Times New Roman", 15))
 hour.place(x=155, y=190)
 
@@ -291,7 +330,8 @@ day_menu = {
     "Saturday": 2,
     "Sunday": 3,
 }
-Label(pred_layout, text="Day :", font=("Bell MT", 15), bg="White").place(x=35, y=230)
+Label(pred_layout, text="Day :", font=("Bell MT", 15), bg="White").place(x=35,
+                                                                         y=230)
 day_keys = list(day_menu.keys())
 day = ttk.Combobox(pred_layout, values=day_keys, width=11)
 day.configure(font=("Times New Roman", 11))
@@ -300,21 +340,20 @@ day.set("Day")
 day.bind("<KeyRelease>", search3)
 
 # xg
-Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35, y=270)
+Label(pred_layout, text="XG :", font=("Bell MT", 15), bg="White").place(x=35,
+                                                                        y=270)
 xg = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 xg.place(x=155, y=270)
 
 # xga
-Label(pred_layout, text="XG Against :", font=("Bell MT", 15), bg="White").place(
-    x=35, y=310
-)
+Label(pred_layout, text="XG Against :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=310)
 xga = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 xga.place(x=155, y=310)
 
 # gf
-Label(pred_layout, text="Goal for :", font=("Bell MT", 15), bg="White").place(
-    x=35, y=350
-)
+Label(pred_layout, text="Goal for :", font=("Bell MT", 15),
+      bg="White").place(x=35, y=350)
 gf = Entry(pred_layout, width=6, font=("Times New Roman", 15))
 gf.place(x=155, y=350)
 
@@ -328,7 +367,7 @@ predict = Button(
     fg="White",
     command=pred_fn,
 )
-predict.place(x=0, y=400)
+predict.place(x=-1, y=400)
 
 # Output Button (Automated)
 predict_auto = Button(
@@ -341,6 +380,5 @@ predict_auto = Button(
     command=pred_fn_auto,
 )
 predict_auto.place(x=180, y=400)
-
 
 pred_layout.mainloop()
