@@ -1,4 +1,3 @@
--- SQLBook: Code
 -- Active: 1667936800479@@127.0.0.1@3306@my_projects
 USE MY_PROJECTS;
 
@@ -54,4 +53,6 @@ ADD Actual_Result varchar(255);
 DELETE from FOOTBALL_PRED_RES;
 
 ALTER TABLE FOOTBALL_PRED_RES
-DROP COLUMN Actual_Result
+DROP COLUMN Actual_Result;
+ALTER TABLE FOOTBALL_PRED_RES
+ADD _Mode varchar(255);
