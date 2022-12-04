@@ -20,9 +20,9 @@ def make_conn():
 # Insert data in Database
 
 
-def insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred):
+def insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, mode, pred):
     make_conn()
-    query = "INSERT INTO FOOTBALL_PRED_RES(VENUE,TEAM,OPPONENT,TIME,DAY,XG,XGA,GF,Pred_Result) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+    query = "INSERT INTO FOOTBALL_PRED_RES(VENUE,TEAM,OPPONENT,TIME,DAY,XG,XGA,GF,_Mode,Pred_Result) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
 
     ven = ("Home" if ven == 1 else "Away")
 
@@ -31,7 +31,7 @@ def insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred):
     t1 = get_key(t1, team_menu)
     t2 = get_key(t2, team_menu)
     d = get_key(d, day_menu)
-    val = (ven, t1, t2, hr, d, xg1, xga1, gf1, pred)
+    val = (ven, t1, t2, hr, d, xg1, xga1, gf1, mode, pred)
 
     cursor.execute(query, val)
     mydb.commit()
@@ -41,7 +41,7 @@ def insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred):
 # Prediction
 
 
-def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
+def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1, mode):
     load = pickle.load(
         open(
             "E:\\Development\\Python\\ML\\Sport Match Prediction\\Desktop App\\Final.pkl",
@@ -49,7 +49,7 @@ def predictors(ven, t1, t2, hr, d, xg1, xga1, gf1):
         ))
     pred = load.predict([[ven, t1, t2, hr, d, xg1, xga1, gf1]])
 
-    insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, pred)
+    insert_db(ven, t1, t2, hr, d, xg1, xga1, gf1, mode, pred)
 
     if pred[0] == 1:
         messagebox.showinfo("Result", "Your Team Wins")
@@ -189,7 +189,7 @@ def pred_fn_auto():
         gf1 = round(random.uniform(0.00, 9.00), 2)
         gf.delete(0, END)
         gf.insert(0, gf1)
-        predictors(ven, t1, t2, hr, d, xg1, xga1, gf1)
+        predictors(ven, t1, t2, hr, d, xg1, xga1, gf1, "Auto")
 
     else:
         pred_fn_auto()  # Recursion
@@ -209,7 +209,7 @@ def pred_fn():
         elif t1 == t2:
             messagebox.askretrycancel("Same Teams", "Try again?")
         else:
-            predictors(ven, t1, t2, hr, d, xg1, xga1, gf1)
+            predictors(ven, t1, t2, hr, d, xg1, xga1, gf1, "Manual")
     except:
         messagebox.showwarning("Warning", "Fields can't be NULL")
 
